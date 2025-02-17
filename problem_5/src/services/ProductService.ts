@@ -76,24 +76,48 @@ class ProductService {
   }
   async update(data:IProduct,idProduct:string):Promise<ServiceResponse>{
     try {
-      const productUpdated = await ProductModel.findByIdAndUpdate(idProduct,{
-        ...data
-      },{
-        new:true
-      })
-      if(!productUpdated){
+      // Tìm sản phẩm dựa trên idProduct
+      const product = await ProductModel.findById(idProduct);
+    
+      // Nếu không tìm thấy sản phẩm
+      if (!product) {
         return {
-          status:400,
-          message:'Not found!',
-          data:null
-        }
+          status: 404,
+          message: 'Product not found!',
+          data: null
+        };
       }
+    
+      console.log("product",product?.userId+'')
+      console.log(" data?.userId", data?.userId)
+      if (product.userId?.toString() !== data?.userId) {
+        return {
+          status: 403,
+          message: 'You do not have permission to update this product!',
+          data: null
+        };
+      }
+    
+      const productUpdated = await ProductModel.findByIdAndUpdate(idProduct, {
+        ...data
+      }, {
+        new: true
+      });
+    
+      if (!productUpdated) {
+        return {
+          status: 400,
+          message: 'Update failed!',
+          data: null
+        };
+      }
+    
       return {
-        status:200,
-        data:productUpdated,
-        message:'Success'
-      }
-      
+        status: 200,
+        data: productUpdated,
+        message: 'Success'
+      };
+    
     } catch (error) {
       return {
         status: 500,
@@ -102,6 +126,7 @@ class ProductService {
         error
       };
     }
+    
   }
 
   async delete(ids: string[], userId: string): Promise<ServiceResponse> {
@@ -159,6 +184,7 @@ class ProductService {
       const totalPages = Math.ceil(totalItems / pageSize);
   
       return {
+        message: 'Success',
         status: 200,
         data: {
           items: result,

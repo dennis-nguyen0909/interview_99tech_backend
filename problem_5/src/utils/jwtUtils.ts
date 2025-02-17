@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 interface TokenPayload {
-  id: string;
-  email: string;
-  role: string;
+  id?: string;
+  email?: string;
+  role?: string;
 }
 
 export const generateAccessToken = async (payload: TokenPayload): Promise<string> => {

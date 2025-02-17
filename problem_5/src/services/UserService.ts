@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/UserModel';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwtUtils';
 import { Request } from 'express';
-
+import jwt, { JwtPayload } from 'jsonwebtoken'
 interface ServiceResponse {
   status: number;
   data: any;
@@ -25,7 +25,6 @@ class UserService {
 
       };
     }
-
     // Check if email exists
     const existingUser = await UserModel.findOne({ email: userData.email });
     if (existingUser) {
@@ -34,6 +33,15 @@ class UserService {
         data: {},
         message: 'Email is already in use',
 
+      };
+    }
+
+    const passwordStrengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordStrengthRegex.test(userData.password)) {
+      return {
+        status: 400,
+        data: {},
+        message: 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.',
       };
     }
 
@@ -161,7 +169,78 @@ class UserService {
       };
     }
   }
+
+  async getDetail(userId:string):Promise<ServiceResponse>{
+    try {
+        const user = await UserModel.findById(userId).select('-password');
+        if(!user){
+            return {
+                status: 404,
+                data: {},
+                message: 'User not found!',
+              };
+        }
+        return {
+            status: 200,
+            data: user,
+          };
+    } catch (error) {
+        return {
+            status: 500,
+            data: {},
+            message: 'Error retrieving user list',
+          };
+    }
+  }
   
+
+  
+  async refreshToken(req: Request): Promise<ServiceResponse> {
+    try {
+      const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'duydeptrai';
+      const token = req.body.refresh_token;
+  
+      const user = await new Promise<JwtPayload>((resolve, reject) => {
+        jwt.verify(token, REFRESH_TOKEN_SECRET, (err: any, decodedUser: JwtPayload | any) => {
+          if (err) {
+            return reject(err);
+          } else {
+            if (decodedUser) {
+              resolve(decodedUser);
+            } else {
+              reject(new Error('User decoding failed'));
+            }
+          }
+        });
+      });
+  
+      const payload = {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      };
+  
+      const accessToken = await generateAccessToken(payload);
+      const refreshToken = await generateRefreshToken(payload);
+  
+      return {
+        status: 200,
+        message: "Success!",
+        data: {
+          accessToken,
+          refreshToken
+        }
+      };
+  
+    } catch (error) {
+      console.error(error);
+      return {
+        status: 500,
+        data: {},
+        message: 'Error retrieving user list',
+      };
+    }
+  }
 
 }
 
