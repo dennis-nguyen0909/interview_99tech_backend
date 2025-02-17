@@ -132,14 +132,12 @@ class UserService {
       const current = parseInt((req.query as any).page || '1');
       const pageSize = parseInt((req.query as any).limit || '10');
       const email = (req.query as any).email || '';
-  
       const skip = (current - 1) * pageSize;
   
       const query: any = {};
       if (email) {
         query.email = { $regex: email, $options: 'i' };
       }
-  
       const result = await UserModel.find(query)
         .skip(skip)
         .limit(pageSize)

@@ -42,6 +42,7 @@ class ProductController {
   }
   async getAll (req:Request,res:Response,next:NextFunction){
     try {
+      
       const result = await ProductService.getAll(req);
       res.status(result.status).json(result);
     } catch (error) {

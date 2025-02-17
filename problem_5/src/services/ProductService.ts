@@ -164,7 +164,7 @@ class ProductService {
       const current = parseInt((req.query as any).page || '1');
       const pageSize = parseInt((req.query as any).limit || '10');
       const search = (req.query as any).search || '';
-  
+      const userId = (req.query as any).userId || ''; 
       const skip = (current - 1) * pageSize;
   
       const query: any = {};
@@ -174,7 +174,11 @@ class ProductService {
           { description: { $regex: search, $options: 'i' } }
         ];
       }
+      if(userId){
+        query.userId=userId
+      }
   
+      console.log("query",query)
       const result = await ProductModel.find(query)
         .skip(skip)
         .limit(pageSize)
