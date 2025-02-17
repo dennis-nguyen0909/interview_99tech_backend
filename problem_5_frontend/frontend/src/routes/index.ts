@@ -27,7 +27,7 @@ export const routes: IRoute[] = [
     {
         path: '/',
         page: HomePage,
-        isShowHeader: false,
+        isShowHeader: true,
         isPrivate:false,
     },
 ];

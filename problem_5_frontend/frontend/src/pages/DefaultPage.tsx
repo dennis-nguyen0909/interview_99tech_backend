@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 
 const DefaultPage = ({ children }) => {
   const navigate = useNavigate();
@@ -14,9 +15,9 @@ const DefaultPage = ({ children }) => {
 
   return (
     <div>
-      <div>Header</div>
+      <Header/>
       <main>{children}</main>
-      <div>Footer</div>
+      {/* <div>Footer</div> */}
     </div>
   );
 };

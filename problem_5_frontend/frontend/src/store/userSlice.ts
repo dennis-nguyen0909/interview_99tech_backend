@@ -18,17 +18,18 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     updateUser(state, action: PayloadAction<UserState>) {
-        return { ...state, ...action.payload };
-      },
-      resetUser() {
-        return initialState;
-      },
-      updatePartialUser(state, action: PayloadAction<Partial<UserState>>) {
-        state = { ...state, ...action.payload };
-      },
+      console.log("state",state,action)
+      return { ...state, ...action.payload };
+    },    
+    resetUser() {
+      return initialState;
+    },
+    updatePartialUser(state, action: PayloadAction<Partial<UserState>>) {
+      // Update only the provided fields
+      Object.assign(state, action.payload); // Using Object.assign to safely update state
+    },
   },
 });
 
-export const { updatePartialUser, resetUser,updateUser } = userSlice.actions;
-
+export const { updatePartialUser, resetUser, updateUser } = userSlice.actions;
 export default userSlice.reducer;
