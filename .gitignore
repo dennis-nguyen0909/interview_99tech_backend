@@ -1,0 +1,42 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker-compose.yml
+Dockerfile
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Dependency directories
+/node_modules
+/.pnp
+.pnp.js
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# TypeScript
+*.tsbuildinfo
+dist/
+build/
+
+# Ignore lock files (optional, depending on project management)
+package-lock.json
+yarn.lock
