@@ -1,11 +1,9 @@
-import { Fragment, Suspense, useState } from 'react'
+import { Fragment, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { routes } from './routes';
 import DefaultPage from './pages/DefaultPage';
 import NotFound from './pages/NotFound';
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
          <Router>

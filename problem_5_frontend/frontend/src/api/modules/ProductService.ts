@@ -3,14 +3,14 @@ import axiosInstance from "../apiInstance";
 import { PRODUCTS_API } from "../route.api";
 
 export const ProductServiceApi = {
-  getAllLists: async (page = 1, limit = 10, query: string = '',userId?:string) => {
+  getAllLists: async (page = 1, limit = 10, query: string = '',userId:string) => {
     // eslint-disable-next-line no-useless-catch
     try {
       const res = await axiosInstance.get(`${PRODUCTS_API}`, {
         params: {
-          page,   // Pass the page number
-          limit,  // Pass the limit of items per page
-          search:query,  // Pass the search query,
+          page,
+          limit,
+          search:query,
           userId:userId
         },
         withCredentials: true,
