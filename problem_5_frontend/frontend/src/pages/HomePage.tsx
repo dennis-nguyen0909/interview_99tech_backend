@@ -1,5 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
-import { Table, Button, Modal, Form, Input, Space, Popconfirm, message, Spin } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Space,
+  Popconfirm,
+  message,
+  Spin,
+} from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { ProductServiceApi } from "../api/modules/ProductService";
@@ -10,7 +20,7 @@ import { handleDecoded } from "../utils";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../store/userSlice";
 import { toast } from "react-toastify";
-import debounce from 'lodash.debounce';
+import debounce from "lodash.debounce";
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -18,15 +28,15 @@ export default function HomePage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form] = Form.useForm();
-  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false); // Loading state
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userDetail = useSelector(state => state.user);
+  const userDetail = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchData = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem("accessToken");
       const { decoded } = handleDecoded(accessToken);
 
       if (decoded?.id) {
@@ -34,7 +44,7 @@ export default function HomePage() {
       }
 
       if (!accessToken) {
-        navigate('/login');
+        navigate("/login");
       }
     };
 
@@ -46,10 +56,10 @@ export default function HomePage() {
       handleGetList();
     }
   }, [userDetail]); // Dependency on userDetail
-  
+
   const handleGetDetailUser = async (idUser: string) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await UserServiceApi.getDetail(idUser);
       if (response.data) {
         dispatch(updateUser({ ...response?.data?.data }));
@@ -59,12 +69,17 @@ export default function HomePage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleGetList = async (page = 1, limit = 5, query?: any) => {
     try {
-      setLoading(true); 
-      const response = await ProductServiceApi.getAllLists(page, limit, query, userDetail?._id);
+      setLoading(true);
+      const response = await ProductServiceApi.getAllLists(
+        page,
+        limit,
+        query,
+        userDetail?._id
+      );
       if (response?.data) {
         setProducts(response?.data?.items);
         setMeta(response?.data?.meta);
@@ -78,9 +93,16 @@ export default function HomePage() {
 
   const createProduct = async (values: Omit<Product, "_id">) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const { name, description, price, category, stock } = values;
-      const response = await ProductServiceApi.create(name, description, price, category, stock, userDetail?._id);
+      const response = await ProductServiceApi.create(
+        name,
+        description,
+        price,
+        category,
+        stock,
+        userDetail?._id
+      );
       if (response.data) {
         toast.success("Create products successfully!");
         setIsModalVisible(false);
@@ -96,7 +118,7 @@ export default function HomePage() {
 
   const updateProduct = async (_id: string, values: Omit<Product, "_id">) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await ProductServiceApi.update({ ...values }, _id);
       if (response.data) {
         toast.success("Updated products successfully!");
@@ -111,9 +133,9 @@ export default function HomePage() {
     }
   };
 
-  const deleteProduct = async (ids: [string]) => {
+  const deleteProduct = async (ids: string[]) => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await ProductServiceApi.delete(ids);
       if (response.data) {
         toast.success("Product deleted successfully!");
@@ -188,14 +210,22 @@ export default function HomePage() {
     },
   ];
 
-  const handleSearch = useCallback(debounce(async (value: string) => {
-      await handleGetList(1, 5, value); 
-  }, 500), []);
+  const handleSearch = useCallback(
+    debounce(async (value: string) => {
+      await handleGetList(1, 5, value);
+    }, 500),
+    []
+  );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchValue(value);
     handleSearch(value);
+  };
+
+  const deleteAllProducts = async () => {
+    const ids = products.map((product) => product._id);
+    await deleteProduct(ids);
   };
   return (
     <div className="p-6">
@@ -205,29 +235,52 @@ export default function HomePage() {
           value={searchValue}
           onChange={handleSearchChange}
           type="text"
-          style={{ width: '50%' }}
+          style={{ width: "50%" }}
           placeholder="Search products...."
         />
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
-          Add Product
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => showModal()}
+          >
+            Add Product
+          </Button>
+          <Button
+            type="default"
+            className="!bg-red-400 !text-white"
+            icon={<DeleteOutlined />}
+          >
+            <Popconfirm
+              title="Are you sure you want to delete all products?"
+              onConfirm={deleteAllProducts} // Call deleteAllProducts on confirm
+              okText="Yes"
+              cancelText="No"
+              placement="left"
+            >
+              Delete All
+            </Popconfirm>
+          </Button>
+        </div>
       </div>
 
-      <Spin spinning={loading}> {/* Show spinner while loading */}
-      <Table
-        columns={columns}
-        dataSource={products}
-        rowKey="_id"
-        pagination={{
-          current: meta?.current_page || 1,
-          pageSize: meta?.per_page || 5,
-          total: meta?.total || 0,
-          onChange: (page, pageSize) => {
-            // Gọi lại API khi thay đổi trang hoặc số lượng item trên trang
-            handleGetList(page, pageSize, searchValue);
-          },
-        }}
-      />
+      <Spin spinning={loading}>
+        {" "}
+        {/* Show spinner while loading */}
+        <Table
+          columns={columns}
+          dataSource={products}
+          rowKey="_id"
+          pagination={{
+            current: meta?.current_page || 1,
+            pageSize: meta?.per_page || 5,
+            total: meta?.total || 0,
+            onChange: (page, pageSize) => {
+              // Gọi lại API khi thay đổi trang hoặc số lượng item trên trang
+              handleGetList(page, pageSize, searchValue);
+            },
+          }}
+        />
       </Spin>
 
       <Modal
@@ -237,13 +290,19 @@ export default function HomePage() {
         onCancel={() => setIsModalVisible(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Name" rules={[{ required: true, message: "Please input the name!" }]}>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please input the name!" }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item
             name="description"
             label="Description"
-            rules={[{ required: true, message: "Please input the description!" }]}
+            rules={[
+              { required: true, message: "Please input the description!" },
+            ]}
           >
             <Input.TextArea />
           </Form.Item>

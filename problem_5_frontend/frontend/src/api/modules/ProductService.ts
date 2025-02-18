@@ -59,7 +59,7 @@ export const ProductServiceApi = {
       throw error;
     }
   },
-  delete: async (ids:[string]) => {
+  delete: async (ids:string[]) => {
     try {
       const res = await axiosInstance({
         method: 'delete',
