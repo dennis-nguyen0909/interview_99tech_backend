@@ -17,7 +17,6 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const response = await AuthServieApi.login(email, password);
-      console.log("response", response);
 
       if (response.status === 200) {
         const { accessToken, refreshToken } = response.data;

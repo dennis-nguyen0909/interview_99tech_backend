@@ -6,7 +6,7 @@ const router: Router = express.Router();
 
 const ProductRouter = (app: Application): void => {
     router.post('',authUserMiddleware,ProductController.create);
-    router.get('/:id',ProductController.getDetail)
+    router.get('/:id',authUserMiddleware,ProductController.getDetail)
     router.patch('/:id',authUserMiddleware,ProductController.update);
     router.delete('',authUserMiddleware,ProductController.delete)
     router.get('',ProductController.getAll);

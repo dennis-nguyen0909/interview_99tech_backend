@@ -94,3 +94,6 @@ Ensure you are using **Node.js version 18 or higher**. You can switch to Node.js
 ---
 
 ## 3. Problem 6: Architecture
+**Folder:** `problem_6`
+Document in file: 
+- README.MD or [Notion](https://irradiated-poultry-d6a.notion.site/99-TECH-Architecture-19f2ec8543a080a99e48e01234f97c1e)

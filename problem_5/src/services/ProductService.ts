@@ -88,8 +88,6 @@ class ProductService {
         };
       }
     
-      console.log("product",product?.userId+'')
-      console.log(" data?.userId", data?.userId)
       if (product.userId?.toString() !== data?.userId) {
         return {
           status: 403,
@@ -178,7 +176,6 @@ class ProductService {
         query.userId=userId
       }
   
-      console.log("query",query)
       const result = await ProductModel.find(query)
         .skip(skip)
         .limit(pageSize)

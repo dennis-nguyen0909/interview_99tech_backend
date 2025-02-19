@@ -7,7 +7,6 @@ const DefaultPage = ({ children }) => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    console.log("accessToken 123",accessToken)
     if (!accessToken) {
       navigate('/login');
     }
