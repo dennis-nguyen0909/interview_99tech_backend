@@ -9,6 +9,7 @@ import {
   Popconfirm,
   message,
   Spin,
+  Select,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,8 @@ import { updateUser } from "../store/userSlice";
 import { toast } from "react-toastify";
 import debounce from "lodash.debounce";
 
+const { Option } = Select;
+
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [meta, setMeta] = useState<Meta>();
@@ -30,6 +33,7 @@ export default function HomePage() {
   const [form] = Form.useForm();
   const [searchValue, setSearchValue] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [priceFilter, setPriceFilter] = useState<string>("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userDetail = useSelector((state) => state.user);
@@ -71,14 +75,15 @@ export default function HomePage() {
     }
   };
 
-  const handleGetList = async (page = 1, limit = 5, query?: any) => {
+  const handleGetList = async (page = 1, limit = 5, query?: any,userId?:string,priceFilter?:string) => {
     try {
       setLoading(true);
       const response = await ProductServiceApi.getAllLists(
         page,
         limit,
         query,
-        userDetail?._id
+        userDetail?._id,
+        priceFilter
       );
       if (response?.data) {
         setProducts(response?.data?.items);
@@ -223,6 +228,12 @@ export default function HomePage() {
     handleSearch(value);
   };
 
+  const handlePriceFilterChange = (value: string) => {
+    setPriceFilter(value);
+    handleGetList(1, 5, searchValue, userDetail?._id, value);
+  };
+
+
   const deleteAllProducts = async () => {
     const ids = products.map((product) => product._id);
     await deleteProduct(ids);
@@ -235,9 +246,18 @@ export default function HomePage() {
           value={searchValue}
           onChange={handleSearchChange}
           type="text"
-          style={{ width: "50%" }}
+          style={{ width: "30%" }}
           placeholder="Search products...."
         />
+        <Select
+          value={priceFilter}
+          onChange={handlePriceFilterChange}
+          style={{ width: "20%" }}
+          placeholder="Chọn giá"
+        >
+          <Option value="highest">Giá cao nhất</Option>
+          <Option value="lowest">Giá thấp nhất</Option>
+        </Select>
         <div className="flex flex-col gap-2">
           <Button
             type="primary"

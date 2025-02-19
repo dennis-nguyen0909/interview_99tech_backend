@@ -163,8 +163,9 @@ class ProductService {
       const pageSize = parseInt((req.query as any).limit || '10');
       const search = (req.query as any).search || '';
       const userId = (req.query as any).userId || ''; 
+      const priceFilter = (req.query as any).priceFilter || '';
       const skip = (current - 1) * pageSize;
-  
+      console.log("priceFilter",req)
       const query: any = {};
       if (search) {
         query.$or = [
@@ -172,14 +173,21 @@ class ProductService {
           { description: { $regex: search, $options: 'i' } }
         ];
       }
-      if(userId){
-        query.userId=userId
+      if (userId) {
+        query.userId = userId;
+      }
+  
+      let sortOption: any = { createdAt: -1 }; // Default sort by creation date descending
+      if (priceFilter === 'highest') {
+        sortOption = { price: -1 }; // Sort by price descending
+      } else if (priceFilter === 'lowest') {
+        sortOption = { price: 1 }; // Sort by price ascending
       }
   
       const result = await ProductModel.find(query)
         .skip(skip)
         .limit(pageSize)
-        .sort({createdAt:-1});
+        .sort(sortOption);
   
       const totalItems = await ProductModel.countDocuments(query);
       const totalPages = Math.ceil(totalItems / pageSize);
